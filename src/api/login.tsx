@@ -1,16 +1,27 @@
 import axios from 'axios';
 
-const GetUser = async (e_mail: string) => {
+const GetUser = async (e_mail: string, password: string) => {
   try {
-    const response = await axios.post(`http://localhost:8080/getUser/${e_mail}`);
+    const API_URL = `http://localhost:8080/login`;
+
+    const response = await axios.post(API_URL, {
+      userEmail: e_mail,        // Use function argument for email
+      userPassword: password,   // Use function argument for password
+    }, {
+      headers: {
+        'Content-Type': 'application/json', // Set header for JSON
+      },
+    });
+
     console.log('User Data From DB:', response.data);
-    console.log('User Data From DB Email:', response.data.userEmail);
-    console.log('User Data From DB Password: ', response.data.userPassword);
-    return response.data; 
-  } catch (error) {
-    console.error('Error validating user:', error);
-    return null; 
+    return response.data;
+  } catch (error: any) {
+    console.error('Error validating user:', error.response?.data || error.message);
+    return null;
   }
 };
+
+
+
 
 export default GetUser;

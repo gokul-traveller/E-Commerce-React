@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import './main.css'
-import GetProducts from './api/products'
-import {CardWithForm} from './loginForm/CardWithForm'
+import { useEffect, useState } from 'react';
+import './App.css';
+import './main.css';
+import GetProducts from './api/products';
+import { CardWithForm } from './loginForm/CardWithForm';
 import ShoppingHome from './shoppingPage/mainShopping';
 
 interface Product {
@@ -18,35 +18,32 @@ interface Product {
 }
 
 function App() {
-  
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await GetProducts(); 
-        setProducts(data); 
-        console.error(data); 
-        console.log(data[0].imageData);
-      } catch (error) {
-        console.error("Error fetching products:", error); 
-      }
-    };
-  
-    fetchProducts(); // Invoke the async function
-  }, []);
-
-
-  const handleLoginSuccess = async(isLoggedIn: boolean) => {
-    setProducts(await(GetProducts()));
-    setStatus(isLoggedIn);
-  };
-  const [status, setStatus] = useState(true);
+  const [status, setStatus] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+
+  // Function to handle login success
+  const handleLoginSuccess = async (isLoggedIn: boolean) => {
+    const fetchedProducts = await GetProducts();
+    if (fetchedProducts) {
+      setProducts(fetchedProducts);
+      setStatus(isLoggedIn);
+    }
+  };
+
+  // Check for valid token on initial load
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      // Optionally validate token with backend here
+      handleLoginSuccess(true); // Assuming token is valid
+    }
+  }, []);
 
   return (
     <>
       {status ? (
         <div className="select-none fullw">
-          <ShoppingHome productss = {products}/>
+          <ShoppingHome productss={products} />
         </div>
       ) : (
         <div className="bg-custom-login flex items-center justify-center">
@@ -55,7 +52,6 @@ function App() {
       )}
     </>
   );
-  
 }
 
-export default App
+export default App;
